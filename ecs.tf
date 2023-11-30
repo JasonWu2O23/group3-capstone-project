@@ -3,7 +3,7 @@
 # accordingly
 
 resource "aws_ecs_task_definition" "own_task_definition" {
-  family                = "luqmantesttaskdef" # Update accordingly
+  family                = "group3-capstone-project-taskdef" # Update accordingly
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   execution_role_arn        = var.ex_role_arn
@@ -11,11 +11,11 @@ resource "aws_ecs_task_definition" "own_task_definition" {
   memory                = 4096
 
   container_definitions = templatefile("./files/task-definition.json", {
-    image_url        = "255945442255.dkr.ecr.us-east-1.amazonaws.com/luqman-test-ecr-repo:latest"
-    container_name   = "luqman-test-ecs"
-    port_name        = "luqman-test-ecs-8080-tcp"
+    image_url        = "255945442255.dkr.ecr.us-east-1.amazonaws.com/group3-capstone-project-ecr:latest"
+    container_name   = "group3-capstone-project-ecs"
+    port_name        = "group3-capstone-project-ecs-8080-tcp"
     log_group_region = "us-east-1"
-    log_group_name   = "/ecs/luqmantesttaskdef"
+    log_group_name   = "/ecs/group3-capstone-project-taskdef"
     log_group_prefix = "ecs"
   })
 }
@@ -23,13 +23,13 @@ resource "aws_ecs_task_definition" "own_task_definition" {
 # Creates an ecs cluster
 
 resource "aws_ecs_cluster" "own_cluster" {
-  name = "luqman-ecs-test-cluster" # Update accordingly
+  name = "group3-capstone-project-ecs-cluster" # Update accordingly
 }
 
 # Creates an ecs service
 
 resource "aws_ecs_service" "own_service" {
-  name             = "my-ecs-service" # Update accordingly
+  name             = "group3-capstone-project-ecs-service" # Update accordingly
   cluster          = aws_ecs_cluster.own_cluster.arn
   task_definition  = aws_ecs_task_definition.own_task_definition.arn
   desired_count    = 1
