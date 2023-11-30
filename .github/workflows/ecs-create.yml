@@ -1,0 +1,78 @@
+name: Terraform Plan & Apply
+
+on:
+  push
+
+jobs:
+  terraform-create:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      ## Here, you can add steps to do docker build -> docker tag -> docker push
+      ## Alternatively, you can do that manually from your local machine 
+      ## Change the below commands as you see fit
+
+      # - name: Login to ECR
+      #   run: aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${ECR_ENDPOINT}
+
+      # - name: Docker build, tag and push to ECR
+      #   run: |
+      #     docker build -t ${IMAGE_NAME} .
+      #     docker tag ${IMAGE_NAME}:latest ${ECR_ENDPOINT}/${IMAGE_NAME}:latest
+      #     docker push ${ECR_ENDPOINT}/${IMAGE_NAME}:latest
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform fmt
+        run: terraform fmt
+
+      - name: Terraform plan
+        run: terraform plan 
+
+      - name: Terraform apply
+        run: terraform apply -auto-approve
+
+  terraform-wait:
+    needs: terraform-create
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pause 10min to verify ecs creation
+        run: sleep 600
+
+  terraform-destroy:
+    needs: terraform-wait
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform destroy
+        run: terraform destroy -auto-approve
+
