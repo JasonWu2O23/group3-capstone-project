@@ -20,6 +20,6 @@ jobs:
 
   # passing the secret to a nested reusable workflow
   pass-secret-to-workflow:
-    uses: ./.github/workflows/ci-cd-pipeline
+    uses: ./.github/workflows/ci-cd-pipeline.yml
     secrets:
        token: ${{ secrets.access_token }}
