@@ -3,7 +3,7 @@ name: Terraform Plan & Apply
 on:
   workflow_call:
     secrets:
-      access-token:
+      access_token:
         description: 'A token passed from the caller workflow'
         required: false
 
@@ -20,6 +20,6 @@ jobs:
 
   # passing the secret to a nested reusable workflow
   pass-secret-to-workflow:
-    uses: ./.github/workflows/ci-cd-pipeline.yml
+    uses: JasonWu2O23/group3-capstone-project-ecr/blob/main/.github/workflows/ci-cd-pipeline.yml@main
     secrets:
        token: ${{ secrets.access_token }}
