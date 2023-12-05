@@ -1,66 +1,25 @@
 name: Terraform Plan & Apply
 
 on:
-  push
+  workflow_call:
+    secrets:
+      access-token:
+        description: 'A token passed from the caller workflow'
+        required: false
 
 jobs:
-  terraform-create:
+
+  pass-secret-to-action:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+    # passing the secret to an action
+      - name: Pass the received secret to an action
+        uses: ./.github/actions/my-action
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          token: ${{ secrets.access-token }}
 
-
-      - name: Terraform init
-        run: terraform init
-
-      - name: Terraform fmt
-        run: terraform fmt
-
-      - name: Terraform plan
-        run: terraform plan 
-
-      - name: Terraform apply
-        run: terraform apply -auto-approve
-
-  terraform-wait:
-    needs: terraform-create
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Pause 10min to verify ecs creation
-        run: sleep 600
-
-  terraform-destroy:
-    needs: terraform-wait
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      
-      - name: Terraform init
-        run: terraform init
-
-      - name: Terraform destroy
-        run: terraform destroy -auto-approve
-
+  # passing the secret to a nested reusable workflow
+  pass-secret-to-workflow:
+    uses: ./group3-capstone-project-ecr/blob/main/.github/workflows/ci-cd-pipeline.yml
+    secrets:
+       token: ${{ secrets.access-token }}
