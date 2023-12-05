@@ -20,6 +20,6 @@ jobs:
 
   # passing the secret to a nested reusable workflow
   pass-secret-to-workflow:
-    uses: ./group3-capstone-project-ecr/blob/main/.github/workflows/ci-cd-pipeline.yml
+    uses: ./group3-capstone-project-ecr/blob/main/.github/workflows/ci-cd-pipeline.yml@main
     secrets:
        token: ${{ secrets.access-token }}
